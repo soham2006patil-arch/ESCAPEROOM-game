@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ESCAPE — Horror Escape Room</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════════ AUTH SCREEN (Login / Signup) ═══════════════════ -->
+  <div id="authScreen" class="auth-screen">
+    <div class="auth-particles" id="authParticles"></div>
+    <div class="auth-container">
+      <div class="auth-brand">
+        <span class="auth-skull">💀</span>
+        <h1 class="auth-logo glitch-text" data-text="ESCAPEROOM">ESCAPE<span class="accent">ROOM</span></h1>
+        <p class="auth-tagline">Enter the darkness... if you dare</p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="auth-panel glass-panel" id="loginPanel">
+        <h2 class="auth-title">🔐 Login</h2>
+        <div class="auth-field">
+          <label>Username</label>
+          <input type="text" id="loginUsername" placeholder="Enter username..." maxlength="20" autocomplete="off" />
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="loginPassword" placeholder="Enter password..." maxlength="30" />
+            <button class="pw-toggle" onclick="togglePasswordVis('loginPassword', this)">👁️</button>
+          </div>
+        </div>
+        <div class="auth-error" id="loginError"></div>
+        <button class="btn btn-blood btn-glow btn-lg auth-btn" onclick="loginUser()">⚡ Enter</button>
+        <p class="auth-switch">No account? <a href="#" onclick="showAuthPanel('signup')">Create one</a></p>
+      </div>
+
+      <!-- Signup Form -->
+      <div class="auth-panel glass-panel hidden" id="signupPanel">
+        <h2 class="auth-title">📝 Sign Up</h2>
+        <div class="auth-field">
+          <label>Username</label>
+          <input type="text" id="signupUsername" placeholder="Choose a username..." maxlength="20" autocomplete="off" />
+        </div>
+        <div class="auth-field">
+          <label>Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="signupPassword" placeholder="Create password..." maxlength="30" />
+            <button class="pw-toggle" onclick="togglePasswordVis('signupPassword', this)">👁️</button>
+          </div>
+          <div class="pw-strength" id="pwStrength"></div>
+        </div>
+        <div class="auth-field">
+          <label>Confirm Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="signupConfirm" placeholder="Confirm password..." maxlength="30" />
+            <button class="pw-toggle" onclick="togglePasswordVis('signupConfirm', this)">👁️</button>
+          </div>
+        </div>
+        <div class="auth-error" id="signupError"></div>
+        <button class="btn btn-blood btn-glow btn-lg auth-btn" onclick="registerUser()">🩸 Create Account</button>
+        <p class="auth-switch">Already have an account? <a href="#" onclick="showAuthPanel('login')">Log in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ LOADING SCREEN ═══════════ -->
+  <div id="loadingScreen" class="loading-screen">
+    <div class="loading-content">
+      <div class="loading-eye">
+        <div class="eye-outer">
+          <div class="eye-inner"></div>
+        </div>
+      </div>
+      <h1 class="loading-title">ESCAPE</h1>
+      <div class="loading-bar-container">
+        <div class="loading-bar" id="loadingBar"></div>
+      </div>
+      <p class="loading-text" id="loadingText">Initializing horror...</p>
+    </div>
+  </div>
+
+  <!-- ═══════════ AMBIENT OVERLAY EFFECTS ═══════════ -->
+  <div class="fog-overlay" id="fogOverlay"></div>
+  <div class="vignette-overlay"></div>
+  <div class="scanline-overlay"></div>
+  <div class="lightning-overlay" id="lightningOverlay"></div>
+
+  <!-- ═══════════ JUMPSCARE OVERLAY ═══════════ -->
+  <div class="jumpscare-static" id="jumpscareStatic"></div>
+  <div class="jumpscare-overlay" id="jumpscareOverlay">
+    <div class="jumpscare-face" id="jumpscareFace"></div>
+    <div class="jumpscare-text" id="jumpscareText"></div>
+  </div>
+
+  <!-- ═══════════ NAVIGATION ═══════════ -->
+  <nav id="navbar">
+    <div class="nav-brand" onclick="navigateTo('home')">
+      <span class="brand-icon">💀</span>
+      <span class="brand-text glitch-text" data-text="ESCAPEROOM">ESCAPE<span class="accent">ROOM</span></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-link active" data-section="home" onclick="navigateTo('home')">Home</a></li>
+      <li><a href="#" class="nav-link" data-section="dashboard" onclick="navigateTo('dashboard')">Dashboard</a></li>
+      <li><a href="#" class="nav-link" data-section="play" onclick="navigateTo('play')">Play</a></li>
+      <li><a href="#" class="nav-link" data-section="multiplayer" onclick="navigateTo('multiplayer')">Multiplayer</a></li>
+      <li><a href="#" class="nav-link" data-section="profile" onclick="navigateTo('profile')">Profile</a></li>
+      <li><a href="#" class="nav-link" data-section="badges" onclick="navigateTo('badges')">Badges</a></li>
+      <li><a href="#" class="nav-link" data-section="leaderboard" onclick="navigateTo('leaderboard')">Leaderboard</a></li>
+      <li><a href="#" class="nav-link" data-section="forum" onclick="navigateTo('forum')">Forum</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="nav-user-info" id="navUserInfo">
+        <span class="nav-coins" id="navCoins" title="Coins">🪙 0</span>
+        <span class="nav-username" id="navUsername">Guest</span>
+      </div>
+      <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle Sound">🔊</button>
+      <button class="btn btn-ghost btn-sm nav-logout-btn" id="navLogoutBtn" onclick="logoutUser()" title="Logout">🚪</button>
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+    </div>
+  </nav>
+
+  <!-- ═══════════ MOBILE MENU ═══════════ -->
+  <div id="mobileMenu" class="mobile-menu">
+    <a href="#" onclick="navigateTo('home'); toggleMobileMenu()">Home</a>
+    <a href="#" onclick="navigateTo('dashboard'); toggleMobileMenu()">Dashboard</a>
+    <a href="#" onclick="navigateTo('play'); toggleMobileMenu()">Play</a>
+    <a href="#" onclick="navigateTo('multiplayer'); toggleMobileMenu()">Multiplayer</a>
+    <a href="#" onclick="navigateTo('profile'); toggleMobileMenu()">Profile</a>
+    <a href="#" onclick="navigateTo('badges'); toggleMobileMenu()">Badges</a>
+    <a href="#" onclick="navigateTo('leaderboard'); toggleMobileMenu()">Leaderboard</a>
+    <a href="#" onclick="navigateTo('forum'); toggleMobileMenu()">Forum</a>
+    <a href="#" onclick="logoutUser(); toggleMobileMenu()" class="mobile-logout">🚪 Logout</a>
+  </div>
+
+  <!-- ═══════════ STORY OVERLAY ═══════════ -->
+  <div id="storyOverlay" class="story-overlay hidden">
+    <div class="story-content">
+      <div class="story-text" id="storyText"></div>
+      <button class="btn btn-blood" id="storyContinueBtn" onclick="advanceStory()">Continue...</button>
+    </div>
+  </div>
+
+  <!-- ═══════════ INVENTORY BAR ═══════════ -->
+  <div id="inventoryBar" class="inventory-bar hidden">
+    <div class="inventory-label">🎒 INVENTORY</div>
+    <div class="inventory-slots" id="inventorySlots">
+      <div class="inv-slot empty" id="invSlot0"></div>
+      <div class="inv-slot empty" id="invSlot1"></div>
+      <div class="inv-slot empty" id="invSlot2"></div>
+      <div class="inv-slot empty" id="invSlot3"></div>
+      <div class="inv-slot empty" id="invSlot4"></div>
+      <div class="inv-slot empty" id="invSlot5"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ HOME SECTION ═══════════════════ -->
+  <section id="home" class="section active">
+    <div class="hero">
+      <div class="hero-particles" id="heroParticles"></div>
+      <canvas id="horrorCanvas" class="horror-canvas"></canvas>
+      <div class="hero-content">
+        <div class="hero-blood-drip"></div>
+        <h1 class="hero-title horror-title">
+          <span class="title-line flicker-text">CAN YOU</span>
+          <span class="title-line accent-glow horror-glow">ESCAPE?</span>
+        </h1>
+        <p class="hero-subtitle">Something watches from the darkness. Something waits...</p>
+        <button class="btn btn-blood btn-glow btn-lg pulse-btn" onclick="navigateTo('play')">
+          <span>🩸 ENTER IF YOU DARE</span>
+        </button>
+      </div>
+
+      <!-- Theme Cards -->
+      <div class="theme-cards">
+        <div class="theme-card horror-card" onclick="handleRoomClick('mansion')" data-room="mansion" id="card-mansion">
+          <div class="card-candle"></div>
+          <div class="theme-icon horror-icon">🏚️</div>
+          <h3>Haunted Mansion</h3>
+          <span class="badge free">FREE</span>
+          <p>5 Rooms · Beginner</p>
+          <div class="card-fog"></div>
+        </div>
+        <div class="theme-card horror-card" onclick="handleRoomClick('asylum')" data-room="asylum" id="card-asylum">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-asylum">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">🧟</div>
+          <h3>Abandoned Asylum</h3>
+          <span class="badge premium">PREMIUM — $4.99</span>
+          <p>7 Rooms · Intermediate</p>
+          <div class="card-fog"></div>
+        </div>
+        <div class="theme-card horror-card" onclick="handleRoomClick('catacombs')" data-room="catacombs" id="card-catacombs">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-catacombs">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">💀</div>
+          <h3>The Catacombs</h3>
+          <span class="badge ultimate">ULTIMATE — $9.99</span>
+          <p>10 Rooms · Expert</p>
+          <div class="card-fog"></div>
+        </div>
+
+        <!-- NEW THEMED ROOMS -->
+        <div class="theme-card horror-card quantum-card" onclick="handleRoomClick('quantum')" data-room="quantum" id="card-quantum">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-quantum">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">⏳</div>
+          <h3>Quantum Time Loop</h3>
+          <span class="badge premium">PREMIUM — $6.99</span>
+          <p>4 Rooms · Hard</p>
+          <div class="card-fog"></div>
+        </div>
+        <div class="theme-card horror-card cyberpunk-card" onclick="handleRoomClick('cyberpunk')" data-room="cyberpunk" id="card-cyberpunk">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-cyberpunk">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">🌃</div>
+          <h3>Cyberpunk Neon District</h3>
+          <span class="badge premium">PREMIUM — $4.99</span>
+          <p>4 Rooms · Intermediate</p>
+          <div class="card-fog"></div>
+        </div>
+        <div class="theme-card horror-card underwater-card" onclick="handleRoomClick('underwater')" data-room="underwater" id="card-underwater">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-underwater">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">🌊</div>
+          <h3>Underwater Research Base</h3>
+          <span class="badge premium">PREMIUM — $4.99</span>
+          <p>4 Rooms · Hard</p>
+          <div class="card-fog"></div>
+        </div>
+        <div class="theme-card horror-card victorian-card" onclick="handleRoomClick('victorian')" data-room="victorian" id="card-victorian">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-victorian">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">🏚️</div>
+          <h3>Haunted Victorian Mansion</h3>
+          <span class="badge ultimate">ULTIMATE — $9.99</span>
+          <p>4 Rooms · Intermediate</p>
+          <div class="card-fog"></div>
+        </div>
+        <div class="theme-card horror-card spacestation-card" onclick="handleRoomClick('spacestation')" data-room="spacestation" id="card-spacestation">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-spacestation">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">🚀</div>
+          <h3>Space Station Reactor</h3>
+          <span class="badge premium">PREMIUM — $7.99</span>
+          <p>5 Rooms · Expert</p>
+          <div class="card-fog"></div>
+        </div>
+        <div class="theme-card horror-card temple-card" onclick="handleRoomClick('temple')" data-room="temple" id="card-temple">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-temple">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">🏛️</div>
+          <h3>Ancient Temple of Illusions</h3>
+          <span class="badge ultimate">ULTIMATE — $9.99</span>
+          <p>4 Rooms · Intermediate</p>
+          <div class="card-fog"></div>
+        </div>
+        <div class="theme-card horror-card hackervault-card" onclick="handleRoomClick('hackervault')" data-room="hackervault" id="card-hackervault">
+          <div class="card-candle"></div>
+          <div class="card-lock-overlay" id="lock-hackervault">
+            <div class="lock-icon">🔒</div>
+            <span class="lock-label">LOCKED</span>
+          </div>
+          <div class="theme-icon horror-icon">💻</div>
+          <h3>Dark Web Hacker Vault</h3>
+          <span class="badge ultimate">ULTIMATE — $8.99</span>
+          <p>4 Rooms · Expert</p>
+          <div class="card-fog"></div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="features">
+        <div class="feature horror-feature">
+          <div class="feature-icon">⏱️</div>
+          <h3>Race Against Death</h3>
+          <p>The clock ticks. Every second brings you closer to being trapped forever.</p>
+        </div>
+        <div class="feature horror-feature">
+          <div class="feature-icon">🧩</div>
+          <h3>Multi-Room Engine</h3>
+          <p>Navigate through interconnected 3D rooms. Each door leads deeper into madness.</p>
+        </div>
+        <div class="feature horror-feature">
+          <div class="feature-icon">🏆</div>
+          <h3>Badge Collection</h3>
+          <p>Earn horrifying badges. Collect them all... if you survive.</p>
+        </div>
+        <div class="feature horror-feature">
+          <div class="feature-icon">📖</div>
+          <h3>Story Mode</h3>
+          <p>Uncover the dark history. Every clue tells a terrible story.</p>
+        </div>
+      </div>
+
+      <!-- Pricing -->
+      <div class="pricing-section">
+        <h2 class="section-title horror-section-title">Choose Your Nightmare</h2>
+        <div class="pricing-cards">
+          <div class="pricing-card horror-pricing">
+            <div class="pricing-header">
+              <h3>Mortal</h3>
+              <div class="price">$0</div>
+            </div>
+            <ul>
+              <li>✅ Haunted Mansion (5 rooms)</li>
+              <li>✅ Leaderboard access</li>
+              <li>✅ Forum participation</li>
+              <li>❌ Premium rooms</li>
+              <li>❌ Story mode</li>
+            </ul>
+            <button class="btn btn-ghost" onclick="navigateTo('play')">Enter Free</button>
+          </div>
+          <div class="pricing-card horror-pricing featured">
+            <div class="pricing-popular">MOST FEARED</div>
+            <div class="pricing-header">
+              <h3>Possessed</h3>
+              <div class="price">$4.99<span>/mo</span></div>
+            </div>
+            <ul>
+              <li>✅ All free features</li>
+              <li>✅ Abandoned Asylum (7 rooms)</li>
+              <li>✅ Quantum Time Loop (4 rooms)</li>
+              <li>✅ Cyberpunk Neon District (4 rooms)</li>
+              <li>✅ Underwater Research Base (4 rooms)</li>
+              <li>✅ Story mode & Badge collection</li>
+              <li>✅ Sound effects pack</li>
+            </ul>
+            <button class="btn btn-blood" id="possessedTierBtn" onclick="purchaseTier('possessed')">Sell Your Soul</button>
+          </div>
+          <div class="pricing-card horror-pricing">
+            <div class="pricing-header">
+              <h3>Undead</h3>
+              <div class="price">$9.99<span>/mo</span></div>
+            </div>
+            <ul>
+              <li>✅ All free features</li>
+              <li>✅ The Catacombs (10 rooms)</li>
+              <li>✅ Victorian Mansion (4 rooms)</li>
+              <li>✅ Space Station Reactor (5 rooms)</li>
+              <li>✅ Temple of Illusions (4 rooms)</li>
+              <li>✅ Hacker Vault (4 rooms)</li>
+              <li>✅ Custom avatar & Hint tokens</li>
+            </ul>
+            <button class="btn btn-ghost" id="undeadTierBtn" onclick="purchaseTier('undead')">Rise Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ PURCHASE MODAL ═══════════════════ -->
+  <div id="purchaseModal" class="purchase-modal-overlay hidden">
+    <div class="purchase-modal">
+      <button class="purchase-close" onclick="closePurchaseModal()">✕</button>
+      <div class="purchase-icon" id="purchaseIcon">🧟</div>
+      <h2 class="purchase-title" id="purchaseTitle">Unlock Theme</h2>
+      <p class="purchase-desc" id="purchaseDesc">Unlock this horrifying experience to test your limits.</p>
+      <div class="purchase-features">
+        <div class="purchase-feature">✓ <span id="purchaseRooms">7</span> Unique Puzzle Rooms</div>
+        <div class="purchase-feature">✓ Exclusive Story & Lore</div>
+        <div class="purchase-feature">✓ Theme-Specific Soundtrack</div>
+        <div class="purchase-feature">✓ Unique Badges to Earn</div>
+      </div>
+      <div class="purchase-price-tag">
+        <span class="purchase-price" id="purchasePrice">$4.99</span>
+        <span class="purchase-one-time">One-time purchase</span>
+      </div>
+      <button class="btn btn-blood btn-glow btn-lg purchase-btn" id="purchaseBtn" onclick="confirmPurchase()">
+        🛒 Purchase & Unlock
+      </button>
+      <p class="purchase-note">Simulated purchase — no real payment required.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ PREMIUM UPGRADE MODAL ═══════════════════ -->
+  <div id="premiumModal" class="purchase-modal-overlay hidden">
+    <div class="purchase-modal premium-upgrade-modal">
+      <button class="purchase-close" onclick="closePremiumModal()">✕</button>
+      <div class="purchase-icon">👑</div>
+      <h2 class="purchase-title">Upgrade to Premium</h2>
+      <p class="purchase-desc">Unlock the full horror experience. Premium players get exclusive access to multiplayer rooms, bonus score multipliers, and the elite badge.</p>
+      <div class="purchase-features">
+        <div class="purchase-feature">✓ Access ALL multiplayer rooms</div>
+        <div class="purchase-feature">✓ 2× Score Multiplier</div>
+        <div class="purchase-feature">✓ Exclusive "Multiplayer Elite" badge</div>
+        <div class="purchase-feature">✓ 500 Bonus Coins</div>
+        <div class="purchase-feature">✓ Premium profile frame</div>
+      </div>
+      <div class="purchase-price-tag">
+        <span class="purchase-price">$14.99</span>
+        <span class="purchase-one-time">One-time upgrade</span>
+      </div>
+      <button class="btn btn-blood btn-glow btn-lg purchase-btn" id="premiumUpgradeBtn" onclick="confirmPremiumUpgrade()">
+        👑 Upgrade Now
+      </button>
+      <p class="purchase-note">Simulated purchase — no real payment.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ TIER PURCHASE MODAL ═══════════════════ -->
+  <div id="tierModal" class="purchase-modal-overlay hidden">
+    <div class="purchase-modal tier-upgrade-modal">
+      <button class="purchase-close" onclick="closeTierModal()">✕</button>
+      <div class="purchase-icon" id="tierIcon">🩸</div>
+      <h2 class="purchase-title" id="tierTitle">Upgrade Plan</h2>
+      <p class="purchase-desc" id="tierDesc">Unlock a collection of horrifying rooms.</p>
+      <div class="purchase-features" id="tierFeatures"></div>
+      <div class="purchase-price-tag">
+        <span class="purchase-price" id="tierPrice">$4.99</span>
+        <span class="purchase-one-time">One-time purchase</span>
+      </div>
+      <button class="btn btn-blood btn-glow btn-lg purchase-btn" id="tierPurchaseBtn" onclick="confirmTierPurchase()">
+        🛒 Purchase & Unlock All
+      </button>
+      <p class="purchase-note">Simulated purchase — no real payment required.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ DASHBOARD SECTION ═══════════════════ -->
+  <section id="dashboard" class="section">
+    <div class="section-container">
+      <h2 class="section-title horror-section-title">📊 Dashboard</h2>
+      <p class="section-subtitle">Your command center, survivor.</p>
+
+      <!-- Stats Row -->
+      <div class="dash-stats-grid">
+        <div class="dash-stat-card glass-panel">
+          <div class="dash-stat-icon">🪙</div>
+          <div class="dash-stat-value" id="dashCoins">0</div>
+          <div class="dash-stat-label">Coins</div>
+        </div>
+        <div class="dash-stat-card glass-panel">
+          <div class="dash-stat-icon">🏆</div>
+          <div class="dash-stat-value" id="dashEscapes">0</div>
+          <div class="dash-stat-label">Total Escapes</div>
+        </div>
+        <div class="dash-stat-card glass-panel">
+          <div class="dash-stat-icon">⏱️</div>
+          <div class="dash-stat-value" id="dashPlaytime">0h 0m</div>
+          <div class="dash-stat-label">Play Time</div>
+        </div>
+        <div class="dash-stat-card glass-panel">
+          <div class="dash-stat-icon">⚔️</div>
+          <div class="dash-stat-value" id="dashRank">Unranked</div>
+          <div class="dash-stat-label">MP Rank</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="dash-actions">
+        <button class="btn btn-blood btn-glow" onclick="navigateTo('play')">🚪 Solo Play</button>
+        <button class="btn btn-blood btn-glow" onclick="navigateTo('multiplayer')">👥 Multiplayer</button>
+        <button class="btn btn-ghost" onclick="navigateTo('profile')">👤 Profile</button>
+        <button class="btn btn-ghost" onclick="navigateTo('badges')">🎖️ Badges</button>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="dash-activity glass-panel">
+        <h3>📜 Recent Activity</h3>
+        <div class="dash-activity-list" id="dashActivity">
+          <div class="dash-activity-empty">No recent activity. Start playing to build your legend!</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ PROFILE SECTION ═══════════════════ -->
+  <section id="profile" class="section">
+    <div class="section-container">
+      <h2 class="section-title horror-section-title">👤 Player Profile</h2>
+
+      <div class="profile-card glass-panel" id="profileCard">
+        <div class="profile-header">
+          <div class="profile-avatar" id="profileAvatar">💀</div>
+          <div class="profile-info">
+            <h3 class="profile-name" id="profileName">Guest</h3>
+            <span class="profile-premium-badge hidden" id="profilePremiumBadge">👑 PREMIUM</span>
+            <p class="profile-joined" id="profileJoined">Joined: —</p>
+          </div>
+        </div>
+
+        <div class="profile-stats-grid">
+          <div class="profile-stat"><span class="profile-stat-val" id="profCoins">0</span><span class="profile-stat-lbl">Coins</span></div>
+          <div class="profile-stat"><span class="profile-stat-val" id="profLevel">1</span><span class="profile-stat-lbl">Level</span></div>
+          <div class="profile-stat"><span class="profile-stat-val" id="profEscapes">0</span><span class="profile-stat-lbl">Escapes</span></div>
+          <div class="profile-stat"><span class="profile-stat-val" id="profRank">—</span><span class="profile-stat-lbl">MP Rank</span></div>
+          <div class="profile-stat"><span class="profile-stat-val" id="profPlaytime">0m</span><span class="profile-stat-lbl">Play Time</span></div>
+          <div class="profile-stat"><span class="profile-stat-val" id="profBadges">0</span><span class="profile-stat-lbl">Badges</span></div>
+        </div>
+
+        <div class="profile-achievements" id="profileAchievements">
+          <h4>🏅 Recent Achievements</h4>
+          <div class="profile-ach-list" id="profAchList">No achievements yet.</div>
+        </div>
+
+        <div class="profile-inventory">
+          <h4>🎒 Inventory</h4>
+          <div class="profile-inv-grid" id="profInventory">Empty</div>
+        </div>
+
+        <div class="profile-actions">
+          <button class="btn btn-blood" id="premiumActionBtn" onclick="openPremiumModal()">👑 Upgrade to Premium</button>
+          <button class="btn btn-ghost" onclick="navigateTo('dashboard')">📊 Dashboard</button>
+          <button class="btn btn-ghost" style="border-color:#8b0000;color:#ff4444;" onclick="confirmLogout()">🚪 Log Out</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ MULTIPLAYER SECTION ═══════════════════ -->
+  <section id="multiplayer" class="section">
+    <div class="section-container">
+      <h2 class="section-title horror-section-title">👥 Multiplayer Lobby</h2>
+      <p class="section-subtitle">Face the darkness together... or perish alone.</p>
+
+      <!-- MP Sub-views -->
+      <div id="mpLobbyView">
+        <!-- Create / Join -->
+        <div class="mp-actions-row">
+          <div class="mp-action-card glass-panel">
+            <h3>🏠 Create Room</h3>
+            <p>Host a new escape room for up to 4 players.</p>
+            <div class="mp-room-settings">
+              <label>Theme</label>
+              <select id="mpThemeSelect">
+                <option value="mansion">🏚️ Haunted Mansion (Free)</option>
+                <option value="asylum">🧟 Abandoned Asylum (Premium)</option>
+                <option value="catacombs">💀 The Catacombs (Premium)</option>
+                <option value="quantum">⏳ Quantum Time Loop (Premium)</option>
+                <option value="cyberpunk">🌃 Cyberpunk Neon District (Free)</option>
+                <option value="underwater">🌊 Underwater Research Base (Free)</option>
+                <option value="victorian">🏚️ Haunted Victorian Mansion (Free)</option>
+                <option value="spacestation">🚀 Space Station Reactor (Premium)</option>
+                <option value="temple">🏛️ Ancient Temple of Illusions (Free)</option>
+                <option value="hackervault">💻 Dark Web Hacker Vault (Premium)</option>
+              </select>
+            </div>
+            <button class="btn btn-blood btn-glow" onclick="createRoom()">⚡ Create Room</button>
+          </div>
+          <div class="mp-action-card glass-panel">
+            <h3>🔗 Join Room</h3>
+            <p>Enter a room code to join an existing game.</p>
+            <div class="mp-room-settings">
+              <label>Room Code</label>
+              <input type="text" id="mpJoinCode" placeholder="Enter 6-digit code..." maxlength="6" style="text-transform:uppercase" autocomplete="off" />
+            </div>
+            <button class="btn btn-blood btn-glow" onclick="joinRoom()">🚪 Join Room</button>
+          </div>
+        </div>
+        <div class="mp-error" id="mpError"></div>
+
+        <!-- Active Rooms List -->
+        <div class="mp-rooms-list glass-panel">
+          <h3>🌐 Active Rooms</h3>
+          <div id="mpRoomsList" class="mp-rooms-grid">
+            <div class="mp-empty">No active rooms. Create one to begin!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MP Room Interface (shown when inside a room) -->
+      <div id="mpRoomView" class="hidden">
+        <div class="mp-room-header glass-panel">
+          <div class="mp-room-title">
+            <h3 id="mpRoomTitle">Room</h3>
+            <span class="mp-room-code" id="mpRoomCode">CODE</span>
+          </div>
+          <div class="mp-room-meta">
+            <span id="mpRoomTheme">🏚️ Mansion</span>
+            <span id="mpRoomTimer" class="mp-timer">--:--</span>
+          </div>
+        </div>
+
+        <!-- Players Panel -->
+        <div class="mp-players glass-panel">
+          <h4>👥 Players <span id="mpPlayerCount">(0/4)</span></h4>
+          <div class="mp-player-list" id="mpPlayerList"></div>
+        </div>
+
+        <!-- Shared Puzzle Progress -->
+        <div class="mp-progress glass-panel">
+          <h4>🧩 Shared Puzzle Progress</h4>
+          <div class="mp-progress-bar-wrapper">
+            <div class="mp-progress-bar" id="mpProgressBar" style="width:0%"></div>
+          </div>
+          <p id="mpProgressText">0 / 0 puzzles solved</p>
+        </div>
+
+        <!-- Chat Box -->
+        <div class="mp-chat glass-panel">
+          <h4>💬 Team Chat</h4>
+          <div class="mp-chat-messages" id="mpChatMessages"></div>
+          <div class="mp-chat-input">
+            <input type="text" id="mpChatInput" placeholder="Type a message..." maxlength="200" autocomplete="off" />
+            <button class="btn btn-blood btn-sm" onclick="sendChatMessage()">Send</button>
+          </div>
+        </div>
+
+        <!-- Room Controls -->
+        <div class="mp-controls">
+          <button class="btn btn-blood btn-glow" id="mpReadyBtn" onclick="toggleReady()">✋ Ready</button>
+          <button class="btn btn-blood btn-glow mp-start-btn" id="mpStartBtn" onclick="startMultiplayerGame()">🚀 Start Game</button>
+          <button class="btn btn-ghost" onclick="leaveRoom()">🚪 Leave Room</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ PLAY SECTION ═══════════════════ -->
+  <section id="play" class="section">
+
+    <!-- Pre-game Lobby -->
+    <div id="gameLobby" class="game-lobby">
+      <div class="lobby-content horror-lobby">
+        <div class="lobby-candles">
+          <div class="candle-flame left"></div>
+          <div class="candle-flame right"></div>
+        </div>
+        <h2 id="lobbyTitle">🏚️ Haunted Mansion</h2>
+        <p class="lobby-desc" id="lobbyDesc">You awaken in darkness. The air is thick with dust and dread. Strange whispers echo through the walls. Five cursed rooms stand between you and freedom — if freedom still exists...</p>
+        <div class="lobby-info">
+          <div class="info-item"><span class="info-label">Rooms</span><span class="info-value" id="lobbyRooms">5</span></div>
+          <div class="info-item"><span class="info-label">Difficulty</span><span class="info-value" id="lobbyDiff">Beginner</span></div>
+          <div class="info-item"><span class="info-label">Time Limit</span><span class="info-value" id="lobbyTime">10:00</span></div>
+          <div class="info-item"><span class="info-label">Soul Cost</span><span class="info-value">∞</span></div>
+        </div>
+        <div class="lobby-name">
+          <label for="playerName">What is your name, mortal?</label>
+          <input type="text" id="playerName" placeholder="Enter your name..." maxlength="20" />
+        </div>
+        <div class="story-toggle-container">
+          <label class="toggle-label">
+            <input type="checkbox" id="storyModeToggle" checked />
+            <span class="toggle-slider"></span>
+            <span>📖 Story Mode</span>
+          </label>
+        </div>
+        <button class="btn btn-blood btn-glow btn-lg" onclick="startGame()">
+          🚪 Enter the Darkness
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Game -->
+    <div id="gameArea" class="game-area hidden">
+
+      <!-- ADVANCED GAME FX LAYERS -->
+      <div class="game-embers-container" id="gameEmbers"></div>
+      <div class="game-vignette" id="gameVignette"></div>
+      <div class="sanity-crack-overlay" id="sanityCrackOverlay"></div>
+      <div class="game-flash-overlay" id="gameFlash"></div>
+      <div class="room-transition-overlay" id="roomTransition"><div class="wipe-bar"></div></div>
+      <canvas class="game-particles-canvas" id="gameParticlesCanvas"></canvas>
+
+      <!-- HUD -->
+      <div class="game-hud horror-hud">
+        <div class="hud-item">
+          <span class="hud-label">Room</span>
+          <span id="hudLevel" class="hud-value">1 / 5</span>
+        </div>
+        <div class="hud-item timer-hud">
+          <span class="hud-label">Time</span>
+          <span id="hudTimer" class="hud-value">10:00</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Score</span>
+          <span id="hudScore" class="hud-value">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Hints</span>
+          <span id="hudHints" class="hud-value">3</span>
+        </div>
+        <div class="hud-item hud-sanity">
+          <span class="hud-label">Sanity</span>
+          <div class="sanity-bar">
+            <div class="sanity-fill" id="sanityFill"></div>
+          </div>
+        </div>
+        <div class="hud-item hud-controls">
+          <button class="hud-btn hud-btn-restart" onclick="confirmRestartGame()" title="Restart Game">🔄</button>
+          <button class="hud-btn hud-btn-exit" onclick="confirmExitGame()" title="Exit Game">✖</button>
+        </div>
+      </div>
+
+      <!-- In-game Confirm Bar (exit/restart) -->
+      <div id="gameConfirmBar" class="game-confirm-bar hidden">
+        <span class="confirm-bar-icon" id="confirmBarIcon">⚠️</span>
+        <span class="confirm-bar-text" id="confirmBarText">Are you sure?</span>
+        <button class="confirm-bar-btn confirm-bar-yes" id="confirmBarYes" onclick="confirmYes()">Yes, Exit</button>
+        <button class="confirm-bar-btn confirm-bar-cancel" onclick="closeConfirmBar()">Cancel</button>
+      </div>
+
+      <!-- Room Mechanic HUD (oxygen, temperature, hack progress, etc.) -->
+      <div id="mechanicHUD" class="mechanic-hud"></div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-bar horror-progress" id="progressBar" style="width: 0%"></div>
+        <div class="progress-stages" id="progressStages"></div>
+      </div>
+
+      <!-- 3D Room Wrapper -->
+      <div class="room-3d-wrapper" id="room3DWrapper">
+        <div class="room-3d-scene" id="room3DScene">
+
+          <!-- 3D Room Walls -->
+          <div class="room-3d-container" id="room3DContainer">
+            <div class="wall wall-back" id="wallBack"></div>
+            <div class="wall wall-left" id="wallLeft"></div>
+            <div class="wall wall-right" id="wallRight"></div>
+            <div class="wall wall-floor" id="wallFloor"></div>
+            <div class="wall wall-ceiling" id="wallCeiling"></div>
+            <div class="room-dust" id="roomDust"></div>
+            <div class="room-light-source" id="roomLight"></div>
+          </div>
+
+          <!-- Room Content Overlay — Puzzle rooms generated dynamically by JS -->
+          <div class="room-content-overlay" id="roomContentOverlay"></div>
+
+          <!-- Room Navigation Arrows -->
+          <button class="room-nav-btn room-nav-left hidden" id="navLeft" onclick="navigateRoom(-1)">
+            <span>◀</span>
+            <small>Previous Room</small>
+          </button>
+          <button class="room-nav-btn room-nav-right hidden" id="navRight" onclick="navigateRoom(1)">
+            <span>▶</span>
+            <small>Next Room</small>
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over / Victory Screen -->
+    <div id="gameResult" class="game-result hidden">
+      <div class="result-content horror-result">
+        <div id="resultIcon" class="result-icon">🎉</div>
+        <h2 id="resultTitle">You Escaped!</h2>
+        <p id="resultMessage">The darkness releases you... for now.</p>
+        <div class="result-stats">
+          <div class="stat"><span class="stat-label">Time Survived</span><span id="resultTime" class="stat-value">--:--</span></div>
+          <div class="stat"><span class="stat-label">Score</span><span id="resultScore" class="stat-value">0</span></div>
+          <div class="stat"><span class="stat-label">Rooms Cleared</span><span id="resultPuzzles" class="stat-value">0/5</span></div>
+          <div class="stat"><span class="stat-label">Hints Used</span><span id="resultHints" class="stat-value">0</span></div>
+        </div>
+        <div class="result-badges" id="resultBadges"></div>
+        <div class="result-actions">
+          <button class="btn btn-blood" onclick="restartGame()">🔄 Face the Horror Again</button>
+          <button class="btn btn-ghost" onclick="exitGame()">🚪 Exit to Menu</button>
+          <button class="btn btn-ghost" onclick="navigateTo('leaderboard')">🏆 Leaderboard</button>
+          <button class="btn btn-ghost" onclick="navigateTo('badges')">🎖️ Badges</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- ═══════════════════ BADGES SECTION ═══════════════════ -->
+  <section id="badges" class="section">
+    <div class="section-container">
+      <h2 class="section-title horror-section-title">🎖️ Badge Collection</h2>
+      <p class="section-subtitle">Trophies of terror. Proof you survived.</p>
+      <div class="badge-stats">
+        <div class="badge-stat-item">
+          <span class="badge-stat-num" id="badgesEarned">0</span>
+          <span class="badge-stat-label">Earned</span>
+        </div>
+        <div class="badge-stat-item">
+          <span class="badge-stat-num" id="badgesTotal">0</span>
+          <span class="badge-stat-label">Total</span>
+        </div>
+        <div class="badge-stat-item">
+          <span class="badge-stat-num" id="badgesPercent">0%</span>
+          <span class="badge-stat-label">Complete</span>
+        </div>
+      </div>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ LEADERBOARD SECTION ═══════════════════ -->
+  <section id="leaderboard" class="section">
+    <div class="section-container">
+      <h2 class="section-title horror-section-title">🏆 Hall of Survivors</h2>
+      <p class="section-subtitle">Those who lived to tell the tale</p>
+      <div class="leaderboard-filters">
+        <button class="filter-btn active" onclick="filterLeaderboard('all')">All Time</button>
+        <button class="filter-btn" onclick="filterLeaderboard('today')">Today</button>
+        <button class="filter-btn" onclick="filterLeaderboard('week')">This Week</button>
+      </div>
+      <div class="leaderboard-table-wrapper">
+        <table class="leaderboard-table horror-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Survivor</th>
+              <th>Score</th>
+              <th>Time</th>
+              <th>Rooms</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <tr class="empty-row">
+              <td colspan="6">No survivors yet. Will you be the first?</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="btn btn-ghost" onclick="clearLeaderboard()" style="margin-top: 1rem;">Clear Records</button>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FORUM SECTION ═══════════════════ -->
+  <section id="forum" class="section">
+    <div class="section-container">
+      <h2 class="section-title horror-section-title">💬 The Whispering Wall</h2>
+      <p class="section-subtitle">Messages from those who dared enter...</p>
+      <div class="forum-new-post horror-forum-post">
+        <h3>Leave Your Mark</h3>
+        <div class="forum-input-group">
+          <input type="text" id="forumAuthor" placeholder="Your name, mortal..." maxlength="20" />
+          <select id="forumCategory">
+            <option value="general">💬 General</option>
+            <option value="tips">💡 Tips & Tricks</option>
+            <option value="spoilers">⚠️ Spoilers</option>
+            <option value="bugs">🐛 Bug Reports</option>
+          </select>
+        </div>
+        <textarea id="forumMessage" placeholder="Share your whispers with the darkness..." maxlength="500" rows="3"></textarea>
+        <div class="forum-post-footer">
+          <span id="forumCharCount">0 / 500</span>
+          <button class="btn btn-blood" onclick="postForumMessage()">Inscribe Message</button>
+        </div>
+      </div>
+      <div class="forum-posts" id="forumPosts">
+        <div class="forum-empty">The wall is blank. Be the first to write upon it...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FOOTER ═══════════════════ -->
+  <footer class="horror-footer">
+    <div class="footer-content">
+      <span class="brand-text">💀 ESCAPE<span class="accent">ROOM</span></span>
+      <p>© 2026 EscapeRoom. All rights reserved. Built with fear, despair & JavaScript.</p>
+      <div class="footer-links">
+        <a href="#" onclick="navigateTo('home')">Home</a>
+        <a href="#" onclick="navigateTo('dashboard')">Dashboard</a>
+        <a href="#" onclick="navigateTo('play')">Play</a>
+        <a href="#" onclick="navigateTo('multiplayer')">Multiplayer</a>
+        <a href="#" onclick="navigateTo('profile')">Profile</a>
+        <a href="#" onclick="navigateTo('badges')">Badges</a>
+        <a href="#" onclick="navigateTo('leaderboard')">Leaderboard</a>
+        <a href="#" onclick="navigateTo('forum')">Forum</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
