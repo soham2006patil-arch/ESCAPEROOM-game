@@ -24,4 +24,5 @@ APIs: - Web Audio API (Sound synthesis)
 Web Storage API (Multiplayer state sync)
 
 DOM Manipulation API
-https://soham2006patil-arch.github.io/ESCAPEROOM-game/
+
+Access the game: https://soham2006patil-arch.github.io/ESCAPEROOM-game/
